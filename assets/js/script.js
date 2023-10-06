@@ -105,6 +105,7 @@ const changeToEditionMode = (arr, id, e) => {
   const findInd = arr.find((el) => el.id === id);
   findInd.isInEditionMode = true;
   e.target.nextElementSibling.disabled = true;
+  e.target.nextElementSibling.checked = false;
   if (e.target.textContent === "Save" || e.target.textContent === "Cancel") {
     findInd.isInEditionMode = false;
   }
@@ -147,6 +148,10 @@ document.addEventListener("click", (e) => {
         text.replaceWith(inputText);
       }
     });
+  }
+  if (e.target.classList.contains("new-input")) {
+    const findInd = tasks.find((el) => el.id === getId);
+    e.target.value = findInd.task;
   }
   if (e.target.textContent === "Save") {
     const newInputValue = e.target.previousElementSibling.value;
