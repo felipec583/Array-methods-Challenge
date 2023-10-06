@@ -4,11 +4,8 @@ const completedTasksCount = document.querySelector(".task-done");
 const taskInfoContainer = document.querySelector(".rows");
 const addTaskButton = document.querySelector(".add-btn");
 let counter = 4;
-const taskCounter = createElement("span", "task-counter");
-totalTasksCount.append(taskCounter);
-const completedTaskCounter = createElement("span", "completed-task-counter");
-completedTasksCount.append(completedTaskCounter);
-
+const taskCounter = document.querySelector(".task-counter");
+const completedTaskCounter = document.querySelector(".completed-task-counter");
 function createElement(ele, eleClass = "") {
   const elem = document.createElement(`${ele}`);
   elem.classList.add(`${eleClass}`);
@@ -28,12 +25,21 @@ const tasks = [
 const countTasks = () => {
   taskCounter.innerHTML = ` ${tasks.length}`;
 };
+const countCompletedTasks = () => {
+  let count = 0;
+  tasks.forEach((task) => {
+    if (task.completed) ++count;
+  });
+  completedTaskCounter.innerHTML = `${count}`;
+};
+
 const renderTaskRow = () => {
   let htmlCont = "";
   tasks.forEach((task) => {
-    const checkInput = task.completed
-      ? `<input type="checkbox" checked class="task-check"/>`
-      : `<input type="checkbox" class="task-check"/>`;
+    const checkInput =
+      task.completed && !task.isInEditionMode
+        ? `<input type="checkbox" checked class="task-check" />`
+        : ` <input type="checkbox" class="task-check"  />`;
     const checkedText =
       task.completed && !task.isInEditionMode
         ? `<p class="task completed">${task.task}</p> 
@@ -42,7 +48,8 @@ const renderTaskRow = () => {
     const editionMode = task.isInEditionMode
       ? `<input class="new-input" type="text">
         <button class="edit">Save</button>
-        <button class="cancel-btn">Cancel</button>`
+        <button class="cancel-btn">Cancel</button>
+        <input type="checkbox" class="task-check" disabled />`
       : `${checkedText} ${checkInput}`;
     htmlCont += `<div id="${task.id}" class="task-row">
       <span>${task.id}</span> 
@@ -51,6 +58,7 @@ const renderTaskRow = () => {
     </div>`;
   });
   countTasks();
+  countCompletedTasks();
   taskInfoContainer.innerHTML = htmlCont;
 };
 renderTaskRow();
@@ -64,18 +72,14 @@ function generateId() {
   return id;
 }
 
-addTaskButton.addEventListener("click", (e) => {
+addTaskButton.addEventListener("click", () => {
   const taskInputValue = taskInput.value;
-  /*  let newId = Math.floor(Math.random() * Date.now());
-  newId = +newId.toString().substring(0, 3); */
-
   const newTask = { id: generateId(), task: taskInputValue, completed: false };
   if (taskInputValue !== "") {
     tasks.push(newTask);
     taskInput.value = "";
     console.log(tasks);
     console.log(counter);
-
     renderTaskRow();
   }
 });
@@ -92,18 +96,18 @@ const changeTaskStatusAndTaskText = (arr, id, e) => {
   }
 };
 
-const countCompletedTasks = () => {
-  let count = 0;
-  tasks.forEach((task) => {
-    if (task.completed) ++count;
-  });
-  completedTaskCounter.innerHTML = `${count}`;
-};
-
 const deleteItems = (arr, id) => {
   const ind = arr.findIndex((element) => element.id === id);
   arr.splice(ind, 1);
   renderTaskRow();
+};
+const changeToEditionMode = (arr, id, e) => {
+  const findInd = arr.find((el) => el.id === id);
+  findInd.isInEditionMode = true;
+  e.target.nextElementSibling.disabled = true;
+  if (e.target.textContent === "Save" || e.target.textContent === "Cancel") {
+    findInd.isInEditionMode = false;
+  }
 };
 
 document.addEventListener("click", (e) => {
@@ -148,6 +152,7 @@ document.addEventListener("click", (e) => {
     const newInputValue = e.target.previousElementSibling.value;
     if (newInputValue !== "") {
       changeText(tasks, getId, newInputValue);
+      changeToEditionMode(tasks, getId, e);
       renderTaskRow();
     }
   }
@@ -157,16 +162,8 @@ document.addEventListener("click", (e) => {
   }
 });
 
-function changeText(arr, id, value) {
+const changeText = (arr, id, value) => {
   const findInd = arr.find((el) => el.id === id);
   console.log(findInd);
   findInd.task = value;
-}
-
-function changeToEditionMode(arr, id, e) {
-  const findInd = arr.find((el) => el.id === id);
-  findInd.isInEditionMode = true;
-  if (e.target.textContent === "Save" || e.target.textContent === "Cancel") {
-    findInd.isInEditionMode = false;
-  }
-}
+};
