@@ -105,7 +105,9 @@ const deleteItems = (arr, id) => {
 const changeToEditionMode = (arr, id, e) => {
   const findInd = arr.find((el) => el.id === id);
   findInd.isInEditionMode = true;
+  e.target.nextElementSibling.disabled = true;
   if (e.target.textContent === "Save" || e.target.textContent === "Cancel") {
+    e.target.nextElementSibling.disabled = false;
     findInd.isInEditionMode = false;
   }
 };
