@@ -30,6 +30,7 @@ const countCompletedTasks = () => {
   tasks.forEach((task) => {
     if (task.completed) ++count;
   });
+
   completedTaskCounter.innerHTML = `${count}`;
 };
 
@@ -104,8 +105,6 @@ const deleteItems = (arr, id) => {
 const changeToEditionMode = (arr, id, e) => {
   const findInd = arr.find((el) => el.id === id);
   findInd.isInEditionMode = true;
-  e.target.nextElementSibling.disabled = true;
-  e.target.nextElementSibling.checked = false;
   if (e.target.textContent === "Save" || e.target.textContent === "Cancel") {
     findInd.isInEditionMode = false;
   }
